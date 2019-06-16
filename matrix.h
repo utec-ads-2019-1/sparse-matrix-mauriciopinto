@@ -7,23 +7,25 @@ using namespace std;
 
 template <typename T>
 class Matrix {
-private:
+public:
     Node<T> *root;
     unsigned rows, columns;
 
-public:
     Matrix(unsigned rows, unsigned columns): root(nullptr), rows(rows), columns(columns){
         root = new Node<T>(-1, -1, -1);
         Node<T>* current1 = root;
         Node<T>* current2 = root;
         for(int i = 0; i < rows + 1; i++){
             Node<T>* newNode1 = new Node<T>(i, -1, i);
-            Node<T>* newNode2 = new Node<T>(-1, i, i);
             current1->next = newNode1;
-            current2->down = newNode2;
             current1 = current1->next;
+        }
+        for(int i = 0; i < columns + 1; i++){
+            Node<T>* newNode1 = new Node<T>(-1, i, i);
+            current2->down = newNode1;
             current2 = current2->down;
         }
+        cout << rows << " " << columns << endl;
     };
 
     Node<T>* find(int x, int y) const{
@@ -46,27 +48,39 @@ public:
     }
 
     void set(int x, int y, T data) const{
-        cout << "setting" << endl;
         if(find(x, y) != nullptr) {
+            cout << "found" << " " << endl;
             (find(x, y))->data = data;
         }
         else {
-            cout << "hola" << endl;
+            cout << "not found" << endl;
             Node<T> *newNode = new Node<T>(x, y, data);
             Node<T> *currentX = root->next;
             Node<T> *currentY = root->down;
+            cout << "current x: " << currentX->x << endl;
+            cout << "x: " << x << endl;
             while (currentX->x != x) {
+                cout << "current x: " << currentX->x << endl;
                 currentX = currentX->next;
             }
+            cout << "current y: " << currentY->y << endl;
+            cout << "y: " << y << endl;
             while (currentY->y != y) {
                 currentY = currentY->down;
             }
+            cout << "coordinates set" << endl;
             if (currentX->down == nullptr) {
+                cout << "no nodes down" << endl;
                 currentX->down = newNode;
-            } else {
-                while (currentX->down->y < y) {
+            }
+            else {
+                cout << "nodes down: " << currentX->data << endl;
+                while (currentX->y != y && currentX->down != nullptr) {
+                    cout << currentX->y << " " << y << endl;
                     currentX = currentX->down;
+                    cout << currentX->y << " " << y << endl;
                 }
+                cout << "moved" << endl;
                 if (currentX->down == nullptr) {
                     currentX->down = newNode;
                 } else {
@@ -74,23 +88,25 @@ public:
                     currentX->down = newNode;
                     newNode->down = currentDown;
                 }
+            }
+            if (currentY->next == nullptr) {
+                currentY->next = newNode;
+            }
+            else {
+                while (currentY->x != x && currentY->next != nullptr) {
+                    currentY = currentY->next;
+                }
                 if (currentY->next == nullptr) {
                     currentY->next = newNode;
                 } else {
-                    while (currentY->next->x < x) {
-                        currentY = currentY->next;
-                    }
-                    if (currentY->next == nullptr) {
-                        currentY->next = newNode;
-                    } else {
-                        Node<T> *currentNext = currentY->next;
-                        currentY->next = newNode;
-                        newNode->next = currentNext;
-                    }
+                    Node<T> *currentNext = currentY->next;
+                    currentY->next = newNode;
+                    newNode->next = currentNext;
                 }
             }
         }
-    };
+        cout << "set complete" << endl;
+};
 
     T operator()(int x, int y) const{
         Node<T>* tempNode = find(x, y);
@@ -117,11 +133,14 @@ public:
     };
     Matrix<T> operator*(Matrix<T> other) const{
         Matrix<T> m1(rows, other.columns);
-        for(int i = 0; i < rows; i++){
-            for(int j = 0; j < columns; j++){
+        for(int i = 0; i < other.columns; i++){
+            for(int j = 0; j < rows; j++){
+                float suma = 0;
+                for(int k = 0; k < columns; k++)
                 if(find(i, j) != nullptr && other.find(i, j) != nullptr) {
-                    m1.set(i, j, find(i, j)->data * other.find(i, j)->data);
+                    suma += find(j, k)->data*other.find(k, i)->data;
                 }
+                m1.set(i, j, suma);
             }
         }
         return m1;
@@ -149,7 +168,15 @@ public:
         return m1;
     };
     Matrix<T> transpose() const{
-        return *this;
+        Matrix<T> m1(columns, rows);
+        for(int i = 0; i < rows; i++){
+            for(int j = 0; j < columns; j++){
+                if(find(i, j) != nullptr) {
+                    m1.set(j, i, find(i, j)->data);
+                }
+            }
+        }
+        return m1;
     };
 
     void print() const{
