@@ -18,7 +18,7 @@ int main() {
             m2.set(i, j, rand()%10);
         }
     }
-    Matrix<int> m3 = m1.transpose();
+    Matrix<int> m3 = m1.operator+(m2);
     m1.print();
     cout << endl;
     m2.print();

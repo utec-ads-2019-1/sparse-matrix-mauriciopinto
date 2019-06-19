@@ -166,9 +166,7 @@ public:
         Matrix<T> m1(rows, other.columns);
         for(int i = 0; i < rows; i++){
             for(int j = 0; j < columns; j++){
-                if(find(i, j) != nullptr && other.find(i, j) != nullptr) {
-                    m1.set(i, j, operator()(i, j) + other.operator()(i, j));
-                }
+                m1.set(i, j, operator()(i, j) + other.operator()(i, j));
             }
         }
         return m1;
@@ -177,9 +175,7 @@ public:
         Matrix<T> m1(rows, other.columns);
         for(int i = 0; i < rows; i++){
             for(int j = 0; j < columns; j++){
-                if(find(i, j) != nullptr && other.find(i, j) != nullptr) {
-                    m1.set(i, j, operator()(i, j)- other.operator()(i, j));
-                }
+                m1.set(i, j, operator()(i, j)- other.operator()(i, j));
             }
         }
         return m1;
@@ -210,13 +206,8 @@ public:
     };
 
     /*~Matrix(){
-        for(unsigned i = rows - 1; i >= 0; i--){
-            for(unsigned j = columns - 1; j >= 0; j--) {
-                if(find(i, j) != nullptr) {
-                    cout << find(i, j)->data << endl;
-                    find(i, j)->killSelf();
-                }
-            }
+        for(int i = rows; i >= 0; i--){
+            find(0, i)->killSelf();
         }
     };*/
 };
