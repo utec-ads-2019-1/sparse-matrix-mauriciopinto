@@ -13,6 +13,9 @@ protected:
 public:
     explicit Node(int x, int y, T data) : next(nullptr), down(nullptr), x(x), y(y), data(data){};
 
+    void killSelf(){
+        delete this;
+    }
     friend class Matrix<T>;
 };
 

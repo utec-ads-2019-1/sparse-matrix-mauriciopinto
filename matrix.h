@@ -25,7 +25,6 @@ public:
             current2->down = newNode1;
             current2 = current2->down;
         }
-        cout << rows << " " << columns << endl;
     };
 
     Node<T>* find(int x, int y) const{
@@ -47,40 +46,27 @@ public:
         }
     }
 
-    void set(int x, int y, T data) const{
+    void addNode(int x, int y, T data) const{
         if(find(x, y) != nullptr) {
-            cout << "found" << " " << endl;
-            (find(x, y))->data = data;
+            find(x, y)->data = data;
         }
         else {
-            cout << "not found" << endl;
             Node<T> *newNode = new Node<T>(x, y, data);
             Node<T> *currentX = root->next;
             Node<T> *currentY = root->down;
-            cout << "current x: " << currentX->x << endl;
-            cout << "x: " << x << endl;
             while (currentX->x != x) {
-                cout << "current x: " << currentX->x << endl;
                 currentX = currentX->next;
             }
-            cout << "current y: " << currentY->y << endl;
-            cout << "y: " << y << endl;
             while (currentY->y != y) {
                 currentY = currentY->down;
             }
-            cout << "coordinates set" << endl;
             if (currentX->down == nullptr) {
-                cout << "no nodes down" << endl;
                 currentX->down = newNode;
             }
             else {
-                cout << "nodes down: " << currentX->data << endl;
                 while (currentX->y != y && currentX->down != nullptr) {
-                    cout << currentX->y << " " << y << endl;
                     currentX = currentX->down;
-                    cout << currentX->y << " " << y << endl;
                 }
-                cout << "moved" << endl;
                 if (currentX->down == nullptr) {
                     currentX->down = newNode;
                 } else {
@@ -105,13 +91,46 @@ public:
                 }
             }
         }
-        cout << "set complete" << endl;
-};
+    }
+
+    void remove(Node<T>* node)const{
+        if(node != nullptr) {
+            Node<T> *currentX = root->next;
+            Node<T> *currentY = root->down;
+            while (currentX->x != node->x) {
+                currentX = currentX->next;
+            }
+            while (currentY->y != node->y) {
+                currentY = currentY->down;
+            }
+            while (currentX->down != node) {
+                currentX = currentX->down;
+            }
+            while (currentY->next != node) {
+                currentY = currentY->next;
+            }
+            currentX->down = node->down;
+            currentY->next = node->next;
+            node = nullptr;
+        }
+        else{
+            return;
+        }
+    }
+
+    void set(int x, int y, T data) const{
+        if(data != 0) {
+            addNode(x, y, data);
+        }
+        else{
+            remove(find(x, y));
+        }
+    };
 
     T operator()(int x, int y) const{
         Node<T>* tempNode = find(x, y);
         if(tempNode == nullptr){
-            throw out_of_range("Node not found");
+            return 0;
         }
         else{
             return tempNode->data;
@@ -123,9 +142,7 @@ public:
         for(int i = 0; i < rows; i++){
             for(int j = 0; j < columns; j++){
                 if(find(i, j) != nullptr) {
-                    cout << "multiplying" << endl;
-                    cout << find(i, j)->data*scalar << endl;
-                    m1.set(i, j, find(i, j)->data*scalar);
+                    m1.set(i, j, operator()(i, j)*scalar);
                 }
             }
         }
@@ -138,7 +155,7 @@ public:
                 float suma = 0;
                 for(int k = 0; k < columns; k++)
                 if(find(i, j) != nullptr && other.find(i, j) != nullptr) {
-                    suma += find(j, k)->data*other.find(k, i)->data;
+                    suma += operator()(j, k)*operator()(k, i);
                 }
                 m1.set(i, j, suma);
             }
@@ -150,7 +167,7 @@ public:
         for(int i = 0; i < rows; i++){
             for(int j = 0; j < columns; j++){
                 if(find(i, j) != nullptr && other.find(i, j) != nullptr) {
-                    m1.set(i, j, find(i, j)->data + other.find(i, j)->data);
+                    m1.set(i, j, operator()(i, j) + other.operator()(i, j));
                 }
             }
         }
@@ -161,7 +178,7 @@ public:
         for(int i = 0; i < rows; i++){
             for(int j = 0; j < columns; j++){
                 if(find(i, j) != nullptr && other.find(i, j) != nullptr) {
-                    m1.set(i, j, find(i, j)->data - other.find(i, j)->data);
+                    m1.set(i, j, operator()(i, j)- other.operator()(i, j));
                 }
             }
         }
@@ -192,7 +209,16 @@ public:
         }
     };
 
-    //~Matrix();
+    /*~Matrix(){
+        for(unsigned i = rows - 1; i >= 0; i--){
+            for(unsigned j = columns - 1; j >= 0; j--) {
+                if(find(i, j) != nullptr) {
+                    cout << find(i, j)->data << endl;
+                    find(i, j)->killSelf();
+                }
+            }
+        }
+    };*/
 };
 
 #endif //SPARSE_MATRIX_MATRIX_H
